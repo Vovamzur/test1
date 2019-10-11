@@ -1,0 +1,26 @@
+{
+  "defaultSeverity": "error",
+  "extends": ["tslint:recommended", "tslint-config-prettier", "tslint-config-airbnb"],
+  "jsRules": {},
+  "rules": {
+    "quotemark": [true, "single"],
+    "prettier/prettier": "error",
+    "comma-dangle": "off",
+    "object-curly-newline": "off",
+    "class-methods-use-this": "off",
+    "prefer-promise-reject-errors": [
+      "warn",
+      {
+        "allowEmptyReject": true
+      }
+    ],
+    "no-throw-literal": "warn",
+    "import/prefer-default-export": "off",
+    "linebreak-style": "off",
+    "no-unused-vars": "warn",
+    "camelcase": "off",
+    "no-unused-expressions": "warn",
+    "node/no-unsupported-features/es-syntax": "off"
+  },
+  "rulesDirectory": []
+}

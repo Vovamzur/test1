@@ -1,0 +1,13 @@
+{
+  "editor.tabSize": 2,
+  "tslint.alwaysShowRuleFailuresAsWarnings": true,
+  "tslint.suppressWhileTypeErrorsPresent": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[javacript]": {
+    "editor.formatOnSave": false
+  },
+  "[typescript]": {
+    "editor.formatOnSave": false
+  }
+}
