@@ -1,13 +1,6 @@
-import express, { Application, Request, Response } from 'express';
+import Master from './Master';
+import Agent from './Agent';
 
-const app: Application = express();
-const port: number = 3000;
-
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!');
-});
-
-app.listen(port, () => {
-  // tslint:disable-next-line: no-console
-  console.log(`App listening on port ${port}!`);
-});
+const master = new Master();
+const agent1 = new Agent();
+const agent2 = new Agent();

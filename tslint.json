@@ -20,7 +20,11 @@
     "no-unused-vars": "warn",
     "camelcase": "off",
     "no-unused-expressions": "warn",
-    "node/no-unsupported-features/es-syntax": "off"
+    "node/no-unsupported-features/es-syntax": "off",
+    "ordered-imports": [false],
+    "object-literal-sort-keys": [false],
+    "interface-name": false,
+    "no-console": false
   },
   "rulesDirectory": []
 }
