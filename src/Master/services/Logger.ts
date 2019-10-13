@@ -7,6 +7,7 @@ export default class Logger {
   }
 
   public write(text: string): boolean {
+    console.log(text);
     return this.loggerFile.write(text);
   }
 

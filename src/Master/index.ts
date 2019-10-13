@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import { MasterEvent } from './events';
 import { connectionLogger, requestsLogger, formConnectionLogLine, formLogLine } from './services/log.service';
 import { imagePath } from './config/images.config';
+import routes from './api/routes';
 
 dotenv.config();
 
@@ -31,20 +32,19 @@ export default class Master {
     this.requestLogger = requestsLogger;
 
     this.setMiddlewares();
-    this.setRoutes();
     this.listen();
     this.setGracefulShutdown();
   }
 
   private initSocketHandlers(): void {
     this.io.on(MasterEvent.CONNECTION, (socket) => {
-      let logLine = formConnectionLogLine(socket);
+      const logLine = formConnectionLogLine(socket);
       this.connectionLogger.write(logLine);
 
       socket.on(MasterEvent.MESSAGE, (data) => {
-        logLine = formLogLine(this.port as number, socket, data);
-
-        this.requestLogger.write(logLine);
+        console.log('socket data', data);
+        // logLine = formLogLine(this.port as number, socket, data);
+        // this.requestLogger.write(logLine);
       })
     });
   }
@@ -68,11 +68,11 @@ export default class Master {
   private setMiddlewares(): void {
     this.app.use(cors());
     this.app.use(express.static(path.resolve(imagePath)));
-  }
-
-  private setRoutes(): void {
-    this.app.get('/who', (req, res) => {
-      res.send('Master');
+    this.app.use(express.json({ limit: '50mb' }));
+    this.app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+    this.app.use('/', routes);
+    this.app.use((req, res, next) => {
+      res.status(404).send('Sorry cant find that!');
     });
   }
 

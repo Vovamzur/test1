@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { Server, createServer } from 'http';
 import dotenv from 'dotenv';
+import axios from 'axios';
 
 import express, { Application, Response, Request } from 'express';
 import socketIoClient, { Socket } from 'socket.io-client';
@@ -9,32 +10,34 @@ import { AgentEvent } from './events';
 
 dotenv.config();
 
+const imagePath = path.resolve(__dirname, 'public', 'image.png');
+
 const informations = [
   {
-    type: 'test',
-    query: 'KPI',
+    json: {
+      type: 'test',
+      query: 'KPI',
+    },
   },
-  'Test here!',
-  { image: true, buffer: fs.readFileSync(path.resolve(__dirname, 'public', 'image.png')) },
+  { raw: 'Test here!' },
+  { image: fs.readFileSync(imagePath) },
 ];
 
 export default class Agent {
-  public static readonly MASTER_PORT: number = 8080;
   private static readonly POLLING_TIME = 2000;
   private static readonly RESEND_TIME = 1000;
   private port: number | string;
-  private masterPort: number | string;
   private app: Application;
   private server: Server;
   private io: typeof Socket;
+  private interval: any;
 
   constructor() {
     this.port = 0;
-    this.masterPort = process.env.MASTER_PORT || Agent.MASTER_PORT;
 
     this.app = express();
     this.server = createServer(this.app);
-    this.io = socketIoClient(`http://localhost:${this.masterPort}`, {
+    this.io = socketIoClient(`http://localhost:${process.env.MASTER_PORT}`, {
       reconnection: true,
     });
 
@@ -66,6 +69,19 @@ export default class Agent {
       // tslint:disable-next-line: no-console
       console.log(`Agent is runnig on port ${this.port}`);
     });
+
+    this.io.on(AgentEvent.CONNECT, () => {
+      console.log('connected')
+      if (!this.interval) {
+        this.startPolling();
+      }
+    });
+
+    this.io.on(AgentEvent.DISCONNECT, () => {
+      console.log('disconnected');
+      clearInterval(this.interval);
+      this.interval = null;
+    })
   }
 
   private getRandomInformation(): any {
@@ -76,17 +92,24 @@ export default class Agent {
   }
 
   private startPolling(): void {
-    setInterval(() => {
+    this.interval = setInterval(() => {
       const info = this.getRandomInformation();
 
-      this.io.emit(AgentEvent.MESSAGE, info);
-      // check for 200 code )))
-      if (!this.io.connected) {
-        setTimeout(() => {
-          this.io.emit(AgentEvent.MESSAGE, info);
-        }, Agent.RESEND_TIME);
+      if (this.io.connected) {
+        // this.sendSocketRequest(info);
+        this.sendHttpRequest(info);
       }
     }, Agent.POLLING_TIME);
+  }
+
+  private sendSocketRequest(info: any): void {
+    this.io.emit(AgentEvent.MESSAGE, info);
+    // check for 200 code )))
+    if (!this.io.connected) {
+      setTimeout(() => {
+        this.io.emit(AgentEvent.MESSAGE, info);
+      }, Agent.RESEND_TIME);
+    }
   }
 
   private setGracefulShutdown(): void {
@@ -101,5 +124,15 @@ export default class Agent {
 
       process.exit(0);
     });
+  }
+
+  private async sendHttpRequest(info: any): Promise<void> {
+    const apiUrl = `http://localhost:${process.env.MASTER_PORT}/data`;
+    const response = await axios.post(apiUrl, info);
+    if (response.status !== 200) {
+      setTimeout(async () => {
+        await axios.post(apiUrl, info);
+      }, Agent.RESEND_TIME)
+    }
   }
 }

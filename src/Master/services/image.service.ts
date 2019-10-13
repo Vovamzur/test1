@@ -4,10 +4,10 @@ import path from 'path';
 import { imagePath } from './../config/images.config';
 
 export const saveFile = (buffer: Buffer): string => {
-  const fileName: string = path.resolve(imagePath, `file${Math.random()}.png`);
+  const fileName = `file${Math.random()}.png`;
+  const filePath: string = path.join(imagePath, fileName);
 
-  fs.writeFileSync(fileName, buffer, 'binary');
+  fs.writeFileSync(filePath, buffer, 'binary');
 
-  console.log('saved');
   return fileName;
 };
