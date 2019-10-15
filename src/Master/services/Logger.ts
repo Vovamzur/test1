@@ -3,6 +3,7 @@ import fs, { WriteStream } from 'fs';
 export default class Logger {
   private loggerFile: WriteStream;
   constructor(filename: string) {
+    this.checkAndCreateDir();
     this.loggerFile = fs.createWriteStream(filename, { flags: 'a' });
   }
 
@@ -13,5 +14,12 @@ export default class Logger {
 
   public close(): void {
     this.loggerFile.close();
+  }
+
+  private checkAndCreateDir(): void {
+    const logDir = './src/Master/logs';
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir);
+    }
   }
 }

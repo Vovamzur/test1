@@ -1,5 +1,6 @@
 import { Server, createServer } from 'http';
 import path from 'path';
+import fs from 'fs';
 
 import express, { Application } from 'express';
 import socketIo from 'socket.io';
@@ -7,7 +8,12 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import { MasterEvent } from './events';
-import { connectionLogger, requestsLogger, formConnectionLogLine, formLogLine } from './services/log.service';
+import {
+  connectionLogger,
+  requestsLogger,
+  formConnectionLogLine,
+  formLogLine,
+} from './services/log.service';
 import { imagePath } from './config/images.config';
 import routes from './api/routes';
 
@@ -27,7 +33,6 @@ export default class Master {
     this.app = express();
     this.server = createServer(this.app);
     this.io = socketIo(this.server);
-
     this.connectionLogger = connectionLogger;
     this.requestLogger = requestsLogger;
 
@@ -46,7 +51,7 @@ export default class Master {
         console.log('socket data', data);
         // logLine = formLogLine(this.port as number, socket, data);
         // this.requestLogger.write(logLine);
-      })
+      });
     });
   }
 

@@ -67,7 +67,7 @@ export default class Agent {
     });
 
     this.io.on(AgentEvent.CONNECT, () => {
-      console.log('connected')
+      console.log('connected');
       if (!this.interval) {
         this.startPolling();
       }
@@ -77,7 +77,7 @@ export default class Agent {
       console.log('disconnected');
       clearInterval(this.interval);
       this.interval = null;
-    })
+    });
   }
 
   private getRandomInformation(): any {
@@ -128,7 +128,7 @@ export default class Agent {
     if (response.status !== 200) {
       setTimeout(async () => {
         await axios.post(apiUrl, info);
-      }, Agent.RESEND_TIME)
+      }, Agent.RESEND_TIME);
     }
   }
 }

@@ -15,36 +15,38 @@ export const formConnectionLogLine = (userAgent: string): string => {
 interface Props {
   raw?: string;
   json?: {
-    type: string,
-    query: string,
+    type: string;
+    query: string;
   };
   imageName?: string;
 }
 
-export const formLogLine =
-  async ({ raw, json, imageName }: Props, userAgent: string): Promise<string> => {
-    const time = new Date().toLocaleString();
+export const formLogLine = async (
+  { raw, json, imageName }: Props,
+  userAgent: string,
+): Promise<string> => {
+  const time = new Date().toLocaleString();
 
-    let res = `[${time}] ${userAgent} - `;
+  let res = `[${time}] ${userAgent} - `;
 
-    if (raw) {
-      res += raw;
+  if (raw) {
+    res += raw;
+    return `${res}\r\n`;
+  }
+  if (json) {
+    try {
+      const count = await getGoogleResultCount(json.query);
+      res += `New JSON: ${JSON.stringify(json)}, About ${count} results`;
+
       return `${res}\r\n`;
+    } catch (err) {
+      throw err;
     }
-    if (json) {
-      try {
-        const count = await getGoogleResultCount(json.query);
-        res += `New JSON: ${JSON.stringify(json)}, About ${count} results`;
+  }
 
-        return `${res}\r\n`;
-      } catch (err) {
-        throw err;
-      }
-    }
-
-    if (imageName) {
-      res += `New Image: ${imageName} (public link)`;
-      return `${res}\r\n`;
-    }
-    return '';
-  };
+  if (imageName) {
+    res += `New Image: ${imageName} (public link)`;
+    return `${res}\r\n`;
+  }
+  return '';
+};
