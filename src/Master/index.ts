@@ -38,7 +38,8 @@ export default class Master {
 
   private initSocketHandlers(): void {
     this.io.on(MasterEvent.CONNECTION, (socket) => {
-      const logLine = formConnectionLogLine(socket);
+      const userAgent = socket.request.headers['user-agent'];
+      const logLine = formConnectionLogLine(userAgent);
       this.connectionLogger.write(logLine);
 
       socket.on(MasterEvent.MESSAGE, (data) => {

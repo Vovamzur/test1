@@ -20,7 +20,7 @@ const informations = [
     },
   },
   { raw: 'Test here!' },
-  { image: fs.readFileSync(imagePath) },
+  { image: fs.readFileSync(imagePath), ext: path.extname(imagePath) },
 ];
 
 export default class Agent {
@@ -54,10 +54,6 @@ export default class Agent {
   }
 
   private setRoutes(): void {
-    this.app.use('/', (req, res) => {
-      res.sendFile(path.join(__dirname, 'public', 'index.html'));
-    });
-
     this.app.get('/who', (req, res) => {
       res.send('Agent!');
     });
